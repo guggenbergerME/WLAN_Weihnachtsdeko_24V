@@ -4,14 +4,12 @@
 #include <PubSubClient.h>   
 #include <ArduinoOTA.h>
 
-const byte relais_A = D0;       
-const byte relais_B = D5;      
-const byte relais_C = D6;       
-const byte relais_D = D7; 
+const byte relais_A = D4;       
+
 
 // Kartendaten
 
-const char* kartenID = "ws2812b_wideboard_VitrineLicht";
+const char* kartenID = "24V_Weihnachten_Lichter";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -23,93 +21,25 @@ const char* mqtt_server = "192.168.150.1";
 
 
 void callback(char* topic, byte* payload, unsigned int length) {
-/*
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-
-  Serial.println();
-*/
 
 
-    if (strcmp(topic,"RK_006/IN/A")==0) {
+    if (strcmp(topic,"Relaiskarte/Weihnachten/24V/IN/A")==0) {
 
         // Kanal A
         if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
                  Serial.println("relais_A -> AN");
                  digitalWrite(relais_A, !HIGH);
-                 client.publish("RK_006/OUT/A","on");
+                 client.publish("Relaiskarte/Weihnachten/24V/IN/A","on");
                 delay(100);
               }
 
         if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
                  Serial.println("relais_A -> AUS");
                  digitalWrite(relais_A, !LOW);
-                 client.publish("RK_006/OUT/A","off");
+                 client.publish("Relaiskarte/Weihnachten/24V/IN/A","off");
                 delay(100);
               }
       } 
-
-
-
-    if (strcmp(topic,"RK_006/IN/B")==0) {
-
-        // Kanal B
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_B -> AN");
-                 digitalWrite(relais_B, !HIGH);
-                 client.publish("RK_006/OUT/B","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_B -> AUS");
-                 digitalWrite(relais_B, !LOW);
-                 client.publish("RK_006/OUT/B","off");
-                delay(100);
-              }
-      }      
-
-
-    if (strcmp(topic,"RK_006/IN/C")==0) {
-
-        // Kanal C
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_C -> AN");
-                 digitalWrite(relais_C, !HIGH);
-                 client.publish("RK_006/OUT/C","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 //digitalWrite(relais_A, !LOW);
-                 Serial.println("relais_C -> AUS");
-                 digitalWrite(relais_C, !LOW);
-                 client.publish("RK_006/OUT/C","off");
-                delay(100);
-              }
-      }
-
-
-    if (strcmp(topic,"RK_006/IN/D")==0) {
-
-        // Kanal D
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
-                 Serial.println("relais_D -> AN");
-                 digitalWrite(relais_D, !HIGH);
-                 client.publish("RK_006/OUT/D","on");                 
-                delay(100);
-              }
-
-        if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
-                 Serial.println("relais_D -> AUS");
-                 digitalWrite(relais_D, !LOW);
-                 client.publish("RK_006/OUT/D","off");
-                delay(100);
-              }
-      }
-
-
 }
 
 
@@ -121,16 +51,14 @@ void reconnect() {
     Serial.print(mqtt_server);
     Serial.println("");
     // Create a random client ID
-    String clientId = "Haussteuerung-";
+    String clientId = "WeihnachtenRelaiskarte-";
     clientId += String(random(0xffff), HEX);
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("Verbunden ....");
       // ... and resubscribe
-      client.subscribe("RK_006/IN/A");
-      client.subscribe("RK_006/IN/B");
-      client.subscribe("RK_006/IN/C");
-      client.subscribe("RK_006/IN/D");           
+      client.subscribe("Relaiskarte/Weihnachten/24V/IN/A");
+          
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -145,16 +73,10 @@ void setup() {
 
 //Pins deklarieren
   pinMode(relais_A, OUTPUT);
-  pinMode(relais_B, OUTPUT);
-  pinMode(relais_C, OUTPUT);
-  pinMode(relais_D, OUTPUT);
 
 // Alle Relais auf LOW setzen
 
   digitalWrite(relais_A, !LOW);
-  digitalWrite(relais_B, !LOW);
-  digitalWrite(relais_C, !LOW);
-  digitalWrite(relais_D, !LOW);
 
 // MQTT Broker
   client.setServer(mqtt_server, 1883);
@@ -164,8 +86,8 @@ void setup() {
   Serial.begin(115200);
 
   // WiFi 
-  IPAddress ip(192, 168, 33, 10);
-	IPAddress dns(192, 168, 1, 3);  
+  IPAddress ip(192, 168, 33, 15);
+	IPAddress dns(192, 168, 1, 1);  
 	IPAddress subnet(255, 255, 0, 0);
 	IPAddress gateway(192, 168, 1, 1);
 	WiFi.config(ip, dns, gateway, subnet);
