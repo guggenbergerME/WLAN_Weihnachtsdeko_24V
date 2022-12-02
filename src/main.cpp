@@ -23,20 +23,20 @@ const char* mqtt_server = "192.168.150.1";
 void callback(char* topic, byte* payload, unsigned int length) {
 
 
-    if (strcmp(topic,"Relaiskarte/Weihnachten/24V/IN/A")==0) {
+    if (strcmp(topic,"Relaiskarte/Weihnachten/24V_1")==0) {
 
         // Kanal A
         if ((char)payload[0] == 'o' && (char)payload[1] == 'n') {  
                  Serial.println("relais_A -> AN");
                  digitalWrite(relais_A, !HIGH);
-                 client.publish("Relaiskarte/Weihnachten/24V/IN/A","on");
+                 //client.publish("Relaiskarte/Weihnachten/24V_1","on");
                 delay(100);
               }
 
         if ((char)payload[0] == 'o' && (char)payload[1] == 'f' && (char)payload[2] == 'f') {  
                  Serial.println("relais_A -> AUS");
                  digitalWrite(relais_A, !LOW);
-                 client.publish("Relaiskarte/Weihnachten/24V/IN/A","off");
+                 //client.publish("Relaiskarte/Weihnachten/24V_1","off");
                 delay(100);
               }
       } 
@@ -47,7 +47,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("connect mytt IP: ");
+    Serial.print("connect mqtt IP: ");
     Serial.print(mqtt_server);
     Serial.println("");
     // Create a random client ID
@@ -57,7 +57,7 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("Verbunden ....");
       // ... and resubscribe
-      client.subscribe("Relaiskarte/Weihnachten/24V/IN/A");
+      client.subscribe("Relaiskarte/Weihnachten/24V_1");
           
     } else {
       Serial.print("failed, rc=");
@@ -128,6 +128,7 @@ void loop() {
   }
   client.loop();
 
+delay(300);
 
   
 }
